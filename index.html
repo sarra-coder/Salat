@@ -1,0 +1,950 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي صلاة - بطل الصلاة الصغير</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800;900&family=Cairo:wght@600;800;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lac: {
+                            teal: '#059669',
+                            lightTeal: '#10b981',
+                            green: '#16a34a',
+                            blue: '#0284c7',
+                            darkBlue: '#0369a1',
+                            navy: '#0f172a',
+                            gold: '#f59e0b',
+                            bgLight: '#f0fdf4'
+                        }
+                    },
+                    fontFamily: {
+                        tajawal: ['Tajawal', 'sans-serif'],
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fef3c7 100%);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .font-cairo {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Card bounce animation */
+        .bounce-hover {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .bounce-hover:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        /* Star Glow Effect */
+        .star-glow {
+            filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+        }
+
+        /* Progress Path Pulse */
+        .pulse-active {
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0284c7;
+            border-radius: 10px;
+        }
+
+        /* Glassmorphism containers */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12 flex flex-col min-h-screen">
+
+    <!-- Top Header / Brand Nav -->
+    <header class="sticky top-0 z-40 glass-panel shadow-md mb-4 border-b border-emerald-100">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-white p-1 border-2 border-lac-teal shadow flex items-center justify-center relative overflow-hidden">
+                    <!-- SVG Logo mimicking LAC Tunisia -->
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="#0284c7" stroke-width="6" stroke-dasharray="10, 5"/>
+                        <text x="100" y="70" text-anchor="middle" fill="#0284c7" font-weight="bold" font-size="28">LAC</text>
+                        <!-- Open Book -->
+                        <path d="M 40,110 Q 100,90 100,130 Q 100,90 160,110 L 160,140 Q 100,120 100,160 Q 100,120 40,140 Z" fill="#0284c7"/>
+                        <!-- Hands cradling -->
+                        <path d="M 30,150 Q 70,185 100,185 Q 130,185 170,150 Q 140,195 100,195 Q 60,195 30,150 Z" fill="#059669"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black font-cairo text-lac-navy flex items-center gap-2">
+                        <span>تحدي صلاة</span>
+                        <span class="text-xs bg-lac-teal text-white px-2 py-0.5 rounded-full font-bold">الأطفال</span>
+                    </h1>
+                    <p class="text-xs font-bold text-lac-teal">علم نافع • عمل رافع</p>
+                </div>
+            </div>
+
+            <!-- User Top Stats Bar (Visible if logged in) -->
+            <div id="topStatsBar" class="hidden flex items-center gap-2 sm:gap-4">
+                <!-- Stars Counter -->
+                <div class="flex items-center gap-1.5 bg-amber-100 border-2 border-amber-400 px-3 py-1.5 rounded-2xl shadow-sm">
+                    <i class="fa-solid fa-star text-amber-500 text-lg star-glow animate-bounce"></i>
+                    <span id="userStarsCount" class="font-black text-amber-900 text-lg">0</span>
+                </div>
+
+                <!-- Level Badge -->
+                <div class="hidden sm:flex items-center gap-1.5 bg-blue-100 border-2 border-blue-400 px-3 py-1.5 rounded-2xl shadow-sm">
+                    <i class="fa-solid fa-trophy text-lac-blue text-base"></i>
+                    <span id="userLevelName" class="font-bold text-lac-darkBlue text-xs">برعم الصلاة</span>
+                </div>
+
+                <!-- Profile Edit Button -->
+                <button onclick="openProfileModal()" class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-lg hover:bg-emerald-600 transition shadow">
+                    <span id="userAvatarIcon">👦</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 flex-grow w-full">
+        
+        <!-- Onboarding / Registration View (Shown if no profile) -->
+        <section id="onboardingSection" class="glass-panel rounded-3xl p-6 md:p-10 my-6 shadow-xl text-center max-w-lg mx-auto border-4 border-emerald-300">
+            <div class="w-24 h-24 mx-auto mb-4 bg-emerald-100 rounded-full flex items-center justify-center border-4 border-lac-teal text-4xl shadow-inner">
+                🕌
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black font-cairo text-lac-navy mb-2">أهلاً بك يا بطل الصلاة! 👋</h2>
+            <p class="text-slate-600 text-sm md:text-base font-semibold mb-6">دعنا نتعرف عليك لنبدأ رحلة التحدي والنجوم اليومية!</p>
+
+            <form id="onboardingForm" onsubmit="saveProfile(event)" class="space-y-4 text-right">
+                <!-- Child Name -->
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">اسمك الجميل <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute right-3 top-3.5 text-slate-400"></i>
+                        <input type="text" id="inputName" required placeholder="مثال: أحمد أو مريم" 
+                               class="w-full pr-10 pl-4 py-3 rounded-2xl border-2 border-emerald-200 focus:border-lac-teal focus:outline-none font-bold text-slate-800 shadow-sm text-base">
+                    </div>
+                </div>
+
+                <!-- Gender Selection -->
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">أنا <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="gender" value="ذكر" checked class="peer hidden">
+                            <div class="p-3 rounded-2xl border-2 border-slate-200 peer-checked:border-lac-blue peer-checked:bg-sky-50 flex items-center justify-center gap-2 font-bold text-slate-700 peer-checked:text-lac-blue transition">
+                                <span class="text-2xl">👦</span>
+                                <span>ولد (بطل)</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="gender" value="أنثى" class="peer hidden">
+                            <div class="p-3 rounded-2xl border-2 border-slate-200 peer-checked:border-pink-500 peer-checked:bg-pink-50 flex items-center justify-center gap-2 font-bold text-slate-700 peer-checked:text-pink-600 transition">
+                                <span class="text-2xl">👧</span>
+                                <span>بنت (بطلة)</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Country Selection -->
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">بلد الإقامة <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <i class="fa-solid fa-globe absolute right-3 top-3.5 text-slate-400"></i>
+                        <select id="inputCountry" required class="w-full pr-10 pl-4 py-3 rounded-2xl border-2 border-emerald-200 focus:border-lac-teal focus:outline-none font-bold text-slate-800 shadow-sm text-base bg-white">
+                            <option value="تونس" selected>🇹🇳 تونس (Tunisia)</option>
+                            <option value="السعودية">🇸🇦 السعودية</option>
+                            <option value="مصر">🇪🇬 مصر</option>
+                            <option value="الجزائر">🇩🇿 الجزائر</option>
+                            <option value="المغرب">🇲🇦 المغرب</option>
+                            <option value="الإمارات">🇦🇪 الإمارات</option>
+                            <option value="الكويت">🇰🇼 الكويت</option>
+                            <option value="قطر">🇶🇦 قطر</option>
+                            <option value="عمان">🇴🇲 عمان</option>
+                            <option value="الأردن">🇯🇴 الأردن</option>
+                            <option value="فلسطين">🇵🇸 فلسطين</option>
+                            <option value="ليبيا">🇱🇾 ليبيا</option>
+                            <option value="العراق">🇮🇶 العراق</option>
+                            <option value="دولة أخرى">🌍 دولة أخرى</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full mt-6 py-4 bg-gradient-to-r from-lac-teal to-lac-blue text-white font-black text-lg rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2">
+                    <span>ابدأ تحدي الصلاة الآن!</span>
+                    <i class="fa-solid fa-rocket"></i>
+                </button>
+            </form>
+        </section>
+
+        <!-- Main Application Dashboard (Shown after profile saved) -->
+        <div id="mainDashboard" class="hidden space-y-6">
+
+            <!-- Welcome Slogan Banner -->
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 rounded-3xl p-5 md:p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                <div class="z-10 text-center md:text-right">
+                    <div class="inline-block bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-extrabold mb-2 text-yellow-200">
+                        ✨ شعار المركز: علم نافع • عمل رافع ✨
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-black font-cairo">مرحباً بك يا <span id="welcomeUserName" class="text-yellow-300">أحمد</span>! 🌟</h2>
+                    <p id="motivationalPhrase" class="text-emerald-100 font-semibold text-sm md:text-base mt-1">
+                        "الصلاة نورٌ في القلب وسببٌ لرضا الرحمن"
+                    </p>
+                </div>
+                <div class="z-10 flex items-center gap-3">
+                    <button onclick="scrollToVideo()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold px-4 py-2.5 rounded-2xl shadow-md transition transform hover:scale-105 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-circle-play text-red-600 text-lg"></i>
+                        <span>تعلم الصلاة بالفيديو</span>
+                    </button>
+                </div>
+                <!-- Background decoration SVG -->
+                <div class="absolute -left-10 -bottom-10 opacity-15 text-white text-9xl pointer-events-none">
+                    <i class="fa-solid fa-mosque"></i>
+                </div>
+            </div>
+
+            <!-- Days of the Week Selector (Monday to Sunday) -->
+            <div class="glass-panel rounded-3xl p-4 shadow-lg border border-emerald-100">
+                <div class="flex items-center justify-between mb-3 px-2">
+                    <h3 class="font-bold text-slate-700 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-days text-lac-blue"></i>
+                        <span>جدول الصلوات الأسبوعي (من الإثنين إلى الأحد)</span>
+                    </h3>
+                    <span id="currentDayBadge" class="text-xs bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-full">
+                        اليوم المحدد: الإثنين
+                    </span>
+                </div>
+
+                <!-- Scrollable Week Buttons -->
+                <div class="grid grid-cols-7 gap-1.5 md:gap-3 text-center" id="weekDaysGrid">
+                    <!-- Days dynamically rendered via JS -->
+                </div>
+            </div>
+
+            <!-- Daily 5 Prayers Section -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between px-2">
+                    <h3 class="font-black text-xl text-lac-navy flex items-center gap-2 font-cairo">
+                        <i class="fa-solid fa-hands-praying text-lac-teal"></i>
+                        <span>صلوات اليوم الخمس</span>
+                    </h3>
+                    <div id="dayProgressTracker" class="text-xs font-bold bg-white border border-slate-200 px-3 py-1 rounded-xl text-slate-600 shadow-sm">
+                        تم أداء: <span id="completedCount" class="text-emerald-600 font-black text-sm">0</span> / 5
+                    </div>
+                </div>
+
+                <!-- 5 Prayers Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3" id="prayersGrid">
+                    <!-- Dynamic rendering of Fajr, Dhuhr, Asr, Maghrib, Isha -->
+                </div>
+            </div>
+
+            <!-- Gamification & Progress Path (مسار التحدي والتقدم) -->
+            <div class="glass-panel rounded-3xl p-6 shadow-lg border border-emerald-100 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-black text-xl text-lac-navy font-cairo flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-amber-500"></i>
+                            <span>مسار التحدي والتقدم</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 font-semibold mt-0.5">اجمع النجوم مع كل صلاة وافتح الألقاب الجديدة!</p>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-xs text-slate-500 font-bold block">مجموع النجوم</span>
+                        <span id="pathTotalStars" class="text-2xl font-black text-amber-500">0 ⭐</span>
+                    </div>
+                </div>
+
+                <!-- Visual Step-by-step Level Progress Map -->
+                <div class="relative py-4 px-2">
+                    <!-- Track Line -->
+                    <div class="absolute top-1/2 left-4 right-4 h-3 bg-slate-200 -translate-y-1/2 rounded-full -z-0"></div>
+                    <div id="progressBarLine" class="absolute top-1/2 right-4 h-3 bg-gradient-to-l from-emerald-500 to-amber-400 -translate-y-1/2 rounded-full transition-all duration-700 -z-0" style="width: 0%;"></div>
+
+                    <!-- Level Milestones -->
+                    <div class="grid grid-cols-5 relative z-10 text-center" id="levelsMilestoneGrid">
+                        <!-- Level 1 -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-emerald-500 text-white border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1">
+                                🌱
+                            </div>
+                            <span class="text-xs font-bold text-slate-700">برعم الصلاة</span>
+                            <span class="text-[10px] text-slate-400">0 نجمة</span>
+                        </div>
+                        <!-- Level 2 -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1" id="badgeLvl2">
+                                🛡️
+                            </div>
+                            <span class="text-xs font-bold text-slate-700">فارس الخشوع</span>
+                            <span class="text-[10px] text-slate-400">10 نجوم</span>
+                        </div>
+                        <!-- Level 3 -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1" id="badgeLvl3">
+                                🌟
+                            </div>
+                            <span class="text-xs font-bold text-slate-700">نجم المساجد</span>
+                            <span class="text-[10px] text-slate-400">25 نجمة</span>
+                        </div>
+                        <!-- Level 4 -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1" id="badgeLvl4">
+                                👑
+                            </div>
+                            <span class="text-xs font-bold text-slate-700">بطل الصلاة</span>
+                            <span class="text-[10px] text-slate-400">50 نجمة</span>
+                        </div>
+                        <!-- Level 5 -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-400 border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1" id="badgeLvl5">
+                                🏆
+                            </div>
+                            <span class="text-xs font-bold text-slate-700">تاج المتقين</span>
+                            <span class="text-[10px] text-slate-400">100 نجمة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Earned Badges Grid -->
+                <div class="border-t border-slate-200 pt-4">
+                    <h4 class="font-bold text-slate-700 text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-award text-amber-500"></i>
+                        <span>شغاف الإنجاز والأوسمة (أوسمتك):</span>
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="badgesContainer">
+                        <!-- Badges rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Educational Section & YouTube Video Integration -->
+            <div id="videoTutorialSection" class="glass-panel rounded-3xl p-6 shadow-lg border border-emerald-100 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="font-black text-xl text-lac-navy font-cairo flex items-center gap-2">
+                            <i class="fa-solid fa-tv text-red-500"></i>
+                            <span>تعلم الصلاة والوضوء بالفيديو والصور</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 font-semibold">شاهد الفيديو التعليمي لتعرف كيف تصلي بثقة وخشوع!</p>
+                    </div>
+                    <span class="bg-red-100 text-red-700 font-bold text-xs px-3 py-1 rounded-full w-fit">
+                        فيديو تعليمي للأطفال
+                    </span>
+                </div>
+
+                <!-- Video Embed Container -->
+                <div class="relative w-full aspect-video rounded-2xl overflow-hidden border-4 border-emerald-200 shadow-md bg-black">
+                    <iframe class="w-full h-full" 
+                            src="https://www.youtube.com/embed/edL3W38ODd4?rel=0" 
+                            title="تعلم كيفية الصلاة للأطفال" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+
+                <!-- Important Educational Rules & Phrases -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3">
+                        <div class="text-2xl">💧</div>
+                        <div>
+                            <h5 class="font-bold text-xs text-emerald-900">أولاً: إسباغ الوضوء</h5>
+                            <p class="text-[11px] text-emerald-700">النظافة شرط الصلاة، أتوضأ كما علمنا الرسول ﷺ</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-sky-50 border border-sky-200 rounded-2xl flex items-center gap-3">
+                        <div class="text-2xl">🕋</div>
+                        <div>
+                            <h5 class="font-bold text-xs text-sky-900">ثانياً: استقبال القبلة</h5>
+                            <p class="text-[11px] text-sky-700">أتجه ببدني وقلبي نحو الكعبة المشرفة بكل خشوع</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
+                        <div class="text-2xl">🤍</div>
+                        <div>
+                            <h5 class="font-bold text-xs text-amber-900">ثالثاً: النية والاطمئنان</h5>
+                            <p class="text-[11px] text-amber-700">أصلي بهدوء ولا أستعجل لأنني أقف بين يدي الله</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Missed Prayer / Skipping Warning Modal -->
+    <div id="reminderModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center border-4 border-amber-400 shadow-2xl space-y-4 animate-bounce-in">
+            <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-4xl border-4 border-amber-400">
+                🔔
+            </div>
+            <h3 class="font-black text-2xl text-slate-800 font-cairo">تذكير محبّ من بطل الصلاة!</h3>
+            <p id="reminderModalText" class="text-slate-600 font-semibold text-sm leading-relaxed">
+                يا بطل، يبدو أنك تخطيت صلاة سابقة! هل صليتها قبل هذه الصلاة؟
+            </p>
+
+            <div class="bg-amber-50 p-3 rounded-2xl border border-amber-200 text-xs text-amber-800 font-bold flex items-center gap-2 justify-center">
+                <i class="fa-solid fa-heart text-red-500"></i>
+                <span>الصلاة في وقتها أحب الأعمال إلى الله</span>
+            </div>
+
+            <div class="flex flex-col gap-2 pt-2">
+                <button id="btnConfirmMissed" onclick="confirmMissedPrayerAction()" class="w-full py-3 bg-lac-teal hover:bg-emerald-600 text-white font-black rounded-xl shadow transition">
+                    نعم، صليتها الآن والحمد لله! 🌟
+                </button>
+                <button onclick="closeReminderModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition text-sm">
+                    حسناً، سأقوم بأدائها فوراً 🏃‍♂️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-right border-4 border-lac-teal shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="font-black text-xl text-lac-navy font-cairo flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-lac-teal"></i>
+                    <span>تعديل بياني المبتكر</span>
+                </h3>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">اسم الطفل</label>
+                    <input type="text" id="editInputName" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold">
+                </div>
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">الجنس</label>
+                    <select id="editInputGender" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold bg-white">
+                        <option value="ذكر">👦 ذكر</option>
+                        <option value="أنثى">👧 أنثى</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">بلد الإقامة</label>
+                    <input type="text" id="editInputCountry" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 font-bold">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <button onclick="updateProfileData()" class="flex-1 py-3 bg-lac-teal text-white font-bold rounded-xl shadow hover:bg-emerald-600 transition">
+                    حفظ التعديلات
+                </button>
+                <button onclick="resetAllData()" class="py-3 px-4 bg-red-100 text-red-600 font-bold rounded-xl hover:bg-red-200 transition text-xs">
+                    إعادة ضبط التحدي 🔄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto pt-6 text-center text-xs text-slate-500 font-semibold border-t border-slate-200/60 max-w-5xl mx-auto w-full px-4">
+        <p>تطبيق تحدي صلاة - موجه للأطفال من عمر 6 إلى 10 سنوات 🌟</p>
+        <p class="mt-1 text-lac-teal font-bold">برعاية المركز التعليمي والتطبيقي | LAC - TUNISIA (C2A)</p>
+    </footer>
+
+    <script>
+        const DAYS_OF_WEEK = [
+            { id: 'mon', name: 'الإثنين' },
+            { id: 'tue', name: 'الثلاثاء' },
+            { id: 'wed', name: 'الأربعاء' },
+            { id: 'thu', name: 'الخميس' },
+            { id: 'fri', name: 'الجمعة' },
+            { id: 'sat', name: 'السبت' },
+            { id: 'sun', name: 'الأحد' }
+        ];
+
+        const PRAYERS = [
+            { id: 'fajr', name: 'الفجر', rakaat: 2, icon: '🌅', color: 'from-amber-400 to-orange-400', time: 'قبل الشروق' },
+            { id: 'dhuhr', name: 'الظهر', rakaat: 4, icon: '☀️', color: 'from-sky-400 to-blue-500', time: 'منتصف النهار' },
+            { id: 'asr', name: 'العصر', rakaat: 4, icon: '🌤️️', color: 'from-teal-400 to-emerald-500', time: 'بعد أصل النهار' },
+            { id: 'maghrib', name: 'المغرب', rakaat: 3, icon: '🌆', color: 'from-indigo-400 to-purple-500', time: 'عند غروب الشمس' },
+            { id: 'isha', name: 'العشاء', rakaat: 4, icon: '🌙', color: 'from-slate-700 to-indigo-900', time: 'في الليل' }
+        ];
+
+        const MOTIVATIONAL_PHRASES = [
+            "الصلاة نورٌ في القلب وسببٌ لرضا الرحمن! ✨",
+            "أنت بطل حقيقي يحرص على صلاته دائماً! 🏆",
+            "الصلاة تمحو الذنوب وتملأ يومك بالبركة والسرور! 🌸",
+            "علم نافع • عمل رافع.. صلاتك هي أعظم أعمالك! 🕌",
+            "من حافظ على الصلاة حفظه الله ونور طريقه! 🌟"
+        ];
+
+        // State objects
+        let userProfile = null; // { name, gender, country }
+        let weeklyData = {}; // { 'mon': { fajr: true, dhuhr: false, ... }, ... }
+        let currentSelectedDay = 'mon';
+        let pendingMissedPrayerCheck = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            initApp();
+        });
+
+        function loadFromLocalStorage() {
+            try {
+                const savedProfile = localStorage.getItem('salat_user_profile');
+                if (savedProfile) {
+                    userProfile = JSON.parse(savedProfile);
+                }
+
+                const savedData = localStorage.getItem('salat_weekly_data');
+                if (savedData) {
+                    weeklyData = JSON.parse(savedData);
+                } else {
+                    initializeEmptyWeeklyData();
+                }
+            } catch (e) {
+                console.error("Error reading LocalStorage", e);
+                initializeEmptyWeeklyData();
+            }
+        }
+
+        function initializeEmptyWeeklyData() {
+            weeklyData = {};
+            DAYS_OF_WEEK.forEach(day => {
+                weeklyData[day.id] = {
+                    fajr: false,
+                    dhuhr: false,
+                    asr: false,
+                    maghrib: false,
+                    isha: false
+                };
+            });
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            try {
+                if (userProfile) {
+                    localStorage.setItem('salat_user_profile', JSON.stringify(userProfile));
+                }
+                localStorage.setItem('salat_weekly_data', JSON.stringify(weeklyData));
+            } catch (e) {
+                console.error("Error saving to LocalStorage", e);
+            }
+        }
+
+        function initApp() {
+            if (!userProfile) {
+                document.getElementById('onboardingSection').classList.remove('hidden');
+                document.getElementById('mainDashboard').classList.add('hidden');
+                document.getElementById('topStatsBar').classList.add('hidden');
+            } else {
+                document.getElementById('onboardingSection').classList.add('hidden');
+                document.getElementById('mainDashboard').classList.remove('hidden');
+                document.getElementById('topStatsBar').classList.remove('hidden');
+                document.getElementById('topStatsBar').classList.add('flex');
+
+                // Set today as default day according to actual day if possible
+                const todayIndex = (new Date().getDay() + 6) % 7; // Map Sun=0 to index 6, Mon=1 to 0
+                currentSelectedDay = DAYS_OF_WEEK[todayIndex] ? DAYS_OF_WEEK[todayIndex].id : 'mon';
+
+                updateUI();
+            }
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputName').value.trim();
+            const genderRadio = document.querySelector('input[name="gender"]:checked');
+            const gender = genderRadio ? genderRadio.value : 'ذكر';
+            const country = document.getElementById('inputCountry').value;
+
+            if (!name) return;
+
+            userProfile = { name, gender, country };
+            saveToLocalStorage();
+
+            // Play celebratory sound tune
+            playSuccessSound();
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+
+            initApp();
+        }
+
+        function updateUI() {
+            if (!userProfile) return;
+
+            // Avatar & Name
+            const avatar = userProfile.gender === 'أنثى' ? '👧' : '👦';
+            document.getElementById('userAvatarIcon').innerText = avatar;
+            document.getElementById('welcomeUserName').innerText = userProfile.name;
+
+            // Random motivational phrase
+            const phrase = MOTIVATIONAL_PHRASES[Math.floor(Math.random() * MOTIVATIONAL_PHRASES.length)];
+            document.getElementById('motivationalPhrase').innerText = `"${phrase}"`;
+
+            // Render Day Selector
+            renderWeekDays();
+
+            // Render Daily Prayer Cards
+            renderPrayerCards();
+
+            // Render Gamification & Progress
+            calculateAndRenderStats();
+        }
+
+        function renderWeekDays() {
+            const container = document.getElementById('weekDaysGrid');
+            container.innerHTML = '';
+
+            const activeDayObj = DAYS_OF_WEEK.find(d => d.id === currentSelectedDay);
+            document.getElementById('currentDayBadge').innerText = `اليوم المحدد: ${activeDayObj ? activeDayObj.name : ''}`;
+
+            DAYS_OF_WEEK.forEach(day => {
+                const dayPrayers = weeklyData[day.id] || {};
+                const completedInDay = Object.values(dayPrayers).filter(Boolean).length;
+                const isSelected = day.id === currentSelectedDay;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => selectDay(day.id);
+                btn.className = `p-2 md:p-3 rounded-2xl flex flex-col items-center justify-between border-2 transition transform duration-200 ${
+                    isSelected 
+                    ? 'border-lac-teal bg-emerald-50 text-emerald-900 shadow-md scale-105 font-black ring-2 ring-emerald-400' 
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="text-xs md:text-sm font-bold">${day.name}</span>
+                    <div class="mt-2 flex items-center justify-center gap-0.5">
+                        ${completedInDay === 5 
+                            ? '<span class="text-amber-500 font-extrabold text-xs">⭐ 5/5</span>' 
+                            : `<span class="text-[11px] text-slate-400">${completedInDay}/5</span>`}
+                    </div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function selectDay(dayId) {
+            currentSelectedDay = dayId;
+            renderWeekDays();
+            renderPrayerCards();
+        }
+
+        function renderPrayerCards() {
+            const container = document.getElementById('prayersGrid');
+            container.innerHTML = '';
+
+            const currentDayState = weeklyData[currentSelectedDay] || {};
+            let completedCount = 0;
+
+            PRAYERS.forEach((prayer, index) => {
+                const isDone = !!currentDayState[prayer.id];
+                if (isDone) completedCount++;
+
+                const card = document.createElement('div');
+                card.className = `glass-panel rounded-2xl p-4 flex flex-col justify-between border-2 bounce-hover relative overflow-hidden ${
+                    isDone ? 'border-emerald-500 bg-emerald-50/90' : 'border-slate-200'
+                }`;
+
+                card.innerHTML = `
+                    <!-- Gradient top tag -->
+                    <div class="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r ${prayer.color}"></div>
+
+                    <div>
+                        <div class="flex items-center justify-between mt-1 mb-2">
+                            <span class="text-3xl">${prayer.icon}</span>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                ${prayer.rakaat} ركعات
+                            </span>
+                        </div>
+                        <h4 class="font-black text-lg text-slate-800">${prayer.name}</h4>
+                        <p class="text-[11px] text-slate-500 font-semibold mb-4">${prayer.time}</p>
+                    </div>
+
+                    <div>
+                        <button onclick="togglePrayer('${prayer.id}', ${index})" 
+                                class="w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm ${
+                                    isDone 
+                                    ? 'bg-emerald-600 text-white hover:bg-emerald-700' 
+                                    : 'bg-slate-100 text-slate-700 hover:bg-emerald-100 hover:text-emerald-800'
+                                }">
+                            ${isDone 
+                                ? '<i class="fa-solid fa-circle-check text-sm"></i> <span>صليتها بحمد الله (تم)</span>' 
+                                : '<i class="fa-regular fa-square text-sm"></i> <span>أداء الصلاة</span>'}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('completedCount').innerText = completedCount;
+        }
+
+        function togglePrayer(prayerId, prayerIndex) {
+            const currentDayState = weeklyData[currentSelectedDay];
+            const currentState = currentDayState[prayerId];
+
+            if (!currentState) {
+                // User is marking this prayer as DONE
+                // Check if any previous prayers today were missed!
+                let missedPrayerName = null;
+                for (let i = 0; i < prayerIndex; i++) {
+                    const prevPrayerId = PRAYERS[i].id;
+                    if (!currentDayState[prevPrayerId]) {
+                        missedPrayerName = PRAYERS[i].name;
+                        break;
+                    }
+                }
+
+                if (missedPrayerName) {
+                    // Trigger warning notification modal!
+                    pendingMissedPrayerCheck = { day: currentSelectedDay, targetPrayerId: prayerId, missedName: missedPrayerName };
+                    showReminderModal(missedPrayerName, PRAYERS[prayerIndex].name);
+                    return;
+                }
+
+                // Normal check
+                currentDayState[prayerId] = true;
+                playSuccessSound();
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+            } else {
+                // Unchecking
+                currentDayState[prayerId] = false;
+            }
+
+            saveToLocalStorage();
+            renderWeekDays();
+            renderPrayerCards();
+            calculateAndRenderStats();
+        }
+
+        function showReminderModal(missedName, targetName) {
+            const modal = document.getElementById('reminderModal');
+            const text = document.getElementById('reminderModalText');
+            text.innerHTML = `يا بطل! يبدو أنك تقوم بتسجيل <span class="font-extrabold text-lac-blue">صلاة ${targetName}</span>، لكن <span class="font-extrabold text-amber-600">صلاة ${missedName}</span> لم تُسجَّل بعد!<br><br>هل تريد تسجيل صلاة <span class="font-bold">${missedName}</span> أولاً لتكسب نجوم البركة؟ ⭐`;
+            modal.classList.remove('hidden');
+        }
+
+        function closeReminderModal() {
+            document.getElementById('reminderModal').classList.add('hidden');
+            pendingMissedPrayerCheck = null;
+        }
+
+        function confirmMissedPrayerAction() {
+            if (pendingMissedPrayerCheck) {
+                const dayState = weeklyData[pendingMissedPrayerCheck.day];
+                // Mark both target and previous prayers as completed!
+                PRAYERS.forEach(p => {
+                    dayState[p.id] = true;
+                });
+                saveToLocalStorage();
+                renderWeekDays();
+                renderPrayerCards();
+                calculateAndRenderStats();
+                playSuccessSound();
+                confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+            }
+            closeReminderModal();
+        }
+
+        function calculateAndRenderStats() {
+            let totalStars = 0;
+
+            // Calculate total completed prayers across all days
+            Object.values(weeklyData).forEach(dayPrayers => {
+                Object.values(dayPrayers).forEach(isDone => {
+                    if (isDone) totalStars += 2; // 2 stars per prayer
+                });
+            });
+
+            // Update Stars displays
+            document.getElementById('userStarsCount').innerText = totalStars;
+            document.getElementById('pathTotalStars').innerText = `${totalStars} ⭐`;
+
+            // Determine level
+            let levelTitle = "برعم الصلاة";
+            let progressPercent = 0;
+
+            if (totalStars >= 100) {
+                levelTitle = "تاج المتقين 🏆";
+                progressPercent = 100;
+            } else if (totalStars >= 50) {
+                levelTitle = "بطل الصلاة 👑";
+                progressPercent = 75;
+            } else if (totalStars >= 25) {
+                levelTitle = "نجم المساجد 🌟";
+                progressPercent = 50;
+            } else if (totalStars >= 10) {
+                levelTitle = "فارس الخشوع 🛡️";
+                progressPercent = 25;
+            } else {
+                levelTitle = "برعم الصلاة 🌱";
+                progressPercent = (totalStars / 10) * 20;
+            }
+
+            document.getElementById('userLevelName').innerText = levelTitle;
+            document.getElementById('progressBarLine').style.width = `${progressPercent}%`;
+
+            // Highlights level icons
+            updateLevelBadgesHighlight(totalStars);
+
+            // Render Earned Badges
+            renderBadges(totalStars);
+        }
+
+        function updateLevelBadgesHighlight(stars) {
+            const lvl2 = document.getElementById('badgeLvl2');
+            const lvl3 = document.getElementById('badgeLvl3');
+            const lvl4 = document.getElementById('badgeLvl4');
+            const lvl5 = document.getElementById('badgeLvl5');
+
+            if (stars >= 10) lvl2.className = "w-12 h-12 rounded-full bg-emerald-500 text-white border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1 pulse-active";
+            if (stars >= 25) lvl3.className = "w-12 h-12 rounded-full bg-amber-500 text-white border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1 pulse-active";
+            if (stars >= 50) lvl4.className = "w-12 h-12 rounded-full bg-indigo-600 text-white border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1 pulse-active";
+            if (stars >= 100) lvl5.className = "w-12 h-12 rounded-full bg-yellow-400 text-slate-900 border-4 border-white shadow-md flex items-center justify-center font-bold text-lg mb-1 pulse-active";
+        }
+
+        function renderBadges(stars) {
+            const container = document.getElementById('badgesContainer');
+            container.innerHTML = '';
+
+            const badgesList = [
+                { title: 'أول صلاة', icon: '🌱', req: 2, desc: 'أول صلاة تسجلها بحمد الله' },
+                { title: 'صليت يوم كامل', icon: '☀️', req: 10, desc: 'أداء 5 صلوات في يوم واحد' },
+                { title: 'مواظب الأسبوع', icon: '🏅', req: 30, desc: 'المحافظة على الصلوات بانتظام' },
+                { title: 'بطل الخشوع', icon: '👑', req: 50, desc: 'جمع 50 نجمة مباركة' }
+            ];
+
+            badgesList.forEach(b => {
+                const unlocked = stars >= b.req;
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-2xl border text-center flex flex-col items-center justify-center transition ${
+                    unlocked 
+                    ? 'bg-amber-50/80 border-amber-300 text-amber-900 shadow-sm' 
+                    : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60'
+                }`;
+
+                card.innerHTML = `
+                    <span class="text-2xl mb-1">${unlocked ? b.icon : '🔒'}</span>
+                    <span class="font-extrabold text-xs">${b.title}</span>
+                    <span class="text-[10px] ${unlocked ? 'text-amber-700' : 'text-slate-400'} font-semibold mt-0.5">${b.desc}</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function playSuccessSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.35); // C6
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } catch (e) {
+                // Audio Context fallback silently
+            }
+        }
+
+        function openProfileModal() {
+            if (!userProfile) return;
+            document.getElementById('editInputName').value = userProfile.name;
+            document.getElementById('editInputGender').value = userProfile.gender;
+            document.getElementById('editInputCountry').value = userProfile.country;
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.add('hidden');
+        }
+
+        function updateProfileData() {
+            const name = document.getElementById('editInputName').value.trim();
+            const gender = document.getElementById('editInputGender').value;
+            const country = document.getElementById('editInputCountry').value.trim();
+
+            if (!name) return;
+
+            userProfile = { name, gender, country };
+            saveToLocalStorage();
+            updateUI();
+            closeProfileModal();
+        }
+
+        function resetAllData() {
+            if (confirm("هل أنت تأكد من إعادة ضبط كل النجوم والبيانات؟")) {
+                localStorage.removeItem('salat_user_profile');
+                localStorage.removeItem('salat_weekly_data');
+                userProfile = null;
+                initializeEmptyWeeklyData();
+                closeProfileModal();
+                initApp();
+            }
+        }
+
+        function scrollToVideo() {
+            document.getElementById('videoTutorialSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+```
